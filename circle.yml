@@ -1,30 +1,34 @@
+general:
+    artifacts:
+        - /home/ubuntu/your-app-name/app/build/outputs/apk/
+
 machine:
-  environment:
-    PATH: "~/$CIRCLE_PROJECT_REPONAME/gradle-2.9/bin:$PATH"
-    TERM: "dumb"
-    ADB_INSTALL_TIMEOUT: "10"
-    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
+    environment:
+        ANDROID_HOME: /usr/local/android-sdk-linux
 
 dependencies:
-  pre:
-    - wget "https://services.gradle.org/distributions/gradle-2.9-bin.zip"; unzip gradle-2.9-bin.zip
-    - echo y | android update sdk --no-ui --all --filter tool,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,android-24
-    - echo y | android update sdk --no-ui --all --filter build-tools-24.0.2
+    override:
+        - echo y | android update sdk --no-ui --all --filter tools,platform-tools,build-tools-24.0.2,android-24,sys-img-armeabi-v7a-android-24,extra-google-m2repository,extra-google-google_play_services,extra-android-support
+        - echo n | android create avd -n testing -f -t android-24
+        - ANDROID_HOME=/usr/local/android-sdk-linux ./gradlew dependencies
 
 test:
-  override:
-    # start the emulator
-    - emulator -avd circleci-android24 -no-audio -no-window:
-        background: true
-        parallel: true
-    # wait for it to have booted
-    - circle-android wait-for-boot
-    # unlock the emulator screen
-    - sleep 30
-    - adb shell input keyevent 82
-    # run tests  against the emulator.
-    - ./gradlew connectedAndroidTest -PdisablePreDex
-    # copy the build outputs to artifacts
-    - cp -r app/build/outputs $CIRCLE_ARTIFACTS
-    # copy the test results to the test results directory.
-    - cp -r app/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
+    override:
+        - (./gradlew assemble):
+            timeout: 360
+
+test:
+     override:
+        - emulator -avd testing -no-audio -no-window:
+            background: true
+            parallel: true
+        - circle-android wait-for-boot
+        - sleep 30
+        - adb shell input keyevent 82
+        - ./gradlew connectedAndroidTest -PdisablePreDex
+        - ADB_INSTALL_TIMEOUT=10 ./gradlew clean spoon --stacktrace --info
+        - test ! -d app/build/outputs || cp -r app/build/outputs $CIRCLE_ARTIFACTS
+        - test ! -d app/build/reports || cp -r app/build/reports $CIRCLE_TEST_REPORTS
+        - test ! -d app/build/spoon || cp -r app/build/spoon $CIRCLE_TEST_REPORTS
+        - cp -r /home/ubuntu/TestApp/app/build/outputs $CIRCLE_ARTIFACTS
+        - cp -r /home/ubuntu/TestApp/app/build/outputs/androidTest-results
