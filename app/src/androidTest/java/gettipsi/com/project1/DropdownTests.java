@@ -1,5 +1,7 @@
 package gettipsi.com.project1;
 
+import android.app.KeyguardManager;
+import android.content.Context;
 import android.support.test.espresso.assertion.ViewAssertions;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -43,6 +45,18 @@ public class DropdownTests {
 
     @Before
     public void initValidData() {
+        activityRule.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    KeyguardManager mKeyGuardManager = (KeyguardManager) activityRule.getActivity().getSystemService(Context.KEYGUARD_SERVICE);
+                    KeyguardManager.KeyguardLock mLock = mKeyGuardManager.newKeyguardLock(Context.KEYGUARD_SERVICE);
+                    mLock.disableKeyguard();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
         items = Arrays.<Object>asList("One", "Two", "Three", "Four");
     }
 
