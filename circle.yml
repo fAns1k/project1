@@ -27,5 +27,5 @@ test:
         - ./gradlew connectedAndroidTest -PdisablePreDex
         - test ! -d app/build/outputs || cp -r app/build/outputs $CIRCLE_ARTIFACTS
         - test ! -d app/build/reports || cp -r app/build/reports $CIRCLE_TEST_REPORTS
-        - cp -r /home/ubuntu/TestApp/app/build/outputs $CIRCLE_ARTIFACTS
-        - cp -r /home/ubuntu/TestApp/app/build/outputs/androidTest-results
+        - cp -r /home/ubuntu/Project1/app/build/outputs $CIRCLE_ARTIFACTS
+        - cp -r /home/ubuntu/Project1/app/build/outputs/androidTest-results
