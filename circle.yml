@@ -22,10 +22,7 @@ test:
             background: true
             parallel: true
         - circle-android wait-for-boot
-        - sleep 30
         - adb shell input keyevent 82
         - ./gradlew connectedAndroidTest -PdisablePreDex
         - test ! -d app/build/outputs || cp -r app/build/outputs $CIRCLE_ARTIFACTS
         - test ! -d app/build/reports || cp -r app/build/reports $CIRCLE_TEST_REPORTS
-        - cp -r /home/ubuntu/Project1/app/build/outputs $CIRCLE_ARTIFACTS
-        - cp -r /home/ubuntu/Project1/app/build/outputs/androidTest-results
