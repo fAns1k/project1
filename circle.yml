@@ -17,14 +17,16 @@ test:
             timeout: 360
 
 test:
+    pre:
+      - emulator -avd circleci-android24 -no-audio -no-window:
+        background: true
+        parallel: true
+      - circle-android wait-for-boot
+      - sleep 30
+      - adb shell input keyevent 82
+      
      override:
-        - $ANDROID_HOME/tools/emulator -avd testing -no-window -no-boot-anim -no-audio:
-            background: true
-            parallel: true
-        - circle-android wait-for-boot
-        - adb shell input keyevent 82:
-            background: true
-        - ./gradlew connectedAndroidTest
+        - ./gradlew connectedAndroidTest -PdisablePreDex
         - ADB_INSTALL_TIMEOUT=10 ./gradlew clean spoon --stacktrace --info
         - test ! -d app/build/outputs || cp -r app/build/outputs $CIRCLE_ARTIFACTS
         - test ! -d app/build/reports || cp -r app/build/reports $CIRCLE_TEST_REPORTS
