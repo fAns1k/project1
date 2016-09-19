@@ -2,12 +2,10 @@ package gettipsi.com.project1;
 
 import android.app.KeyguardManager;
 import android.content.Context;
-import android.os.SystemClock;
 import android.support.test.espresso.assertion.ViewAssertions;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
-import android.view.WindowManager;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -47,20 +45,16 @@ public class DropdownTests {
 
     @Before
     public void initValidData() {
-        final MainActivity activity = activityRule.getActivity();
-        activity.runOnUiThread(new Runnable() {
+        activityRule.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                KeyguardManager mKG = (KeyguardManager) activity.getSystemService(Context.KEYGUARD_SERVICE);
-                KeyguardManager.KeyguardLock mLock = mKG.newKeyguardLock("keyguard");
-                mLock.disableKeyguard();
-
-                //turn the screen on
-                activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
-                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                        | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-                        | WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
+                try {
+                    KeyguardManager mKeyGuardManager = (KeyguardManager) activityRule.getActivity().getSystemService(Context.KEYGUARD_SERVICE);
+                    KeyguardManager.KeyguardLock mLock = mKeyGuardManager.newKeyguardLock(Context.KEYGUARD_SERVICE);
+                    mLock.disableKeyguard();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
         items = Arrays.<Object>asList("One", "Two", "Three", "Four");
@@ -82,22 +76,22 @@ public class DropdownTests {
                 .perform(new SetSelectedAction(0))
                 .check(matches(withSpinnerText(items.get(0).toString())));
 
-        SystemClock.sleep(1000);
+//        SystemClock.sleep(1000);
         onView(withId(R.id.dropdownId))
                 .perform(new SetSelectedAction(1))
                 .check(matches(withSpinnerText(items.get(1).toString())));
 
-        SystemClock.sleep(1000);
+//        SystemClock.sleep(1000);
         onView(withId(R.id.dropdownId))
                 .perform(new SetSelectedAction(2))
                 .check(matches(withSpinnerText(items.get(2).toString())));
 
-        SystemClock.sleep(1000);
+//        SystemClock.sleep(1000);
         onView(withId(R.id.dropdownId))
                 .perform(new SetSelectedAction(3))
                 .check(matches(withSpinnerText(items.get(3).toString())));
 
-        SystemClock.sleep(1000);
+//        SystemClock.sleep(1000);
 
     }
 
@@ -108,22 +102,22 @@ public class DropdownTests {
                 .perform(new SelectElementWithNameAction(items.get(0).toString()))
                 .check(matches(withSpinnerText(items.get(0).toString())));
 
-        SystemClock.sleep(1000);
+//        SystemClock.sleep(1000);
         onView(withId(R.id.dropdownId))
                 .perform(new SelectElementWithNameAction(items.get(1).toString()))
                 .check(matches(withSpinnerText(items.get(1).toString())));
 
-        SystemClock.sleep(1000);
+//        SystemClock.sleep(1000);
         onView(withId(R.id.dropdownId))
                 .perform(new SelectElementWithNameAction(items.get(2).toString()))
                 .check(matches(withSpinnerText(items.get(2).toString())));
 
-        SystemClock.sleep(1000);
+//        SystemClock.sleep(1000);
         onView(withId(R.id.dropdownId))
                 .perform(new SelectElementWithNameAction(items.get(3).toString()))
                 .check(matches(withSpinnerText(items.get(3).toString())));
 
-        SystemClock.sleep(1000);
+//        SystemClock.sleep(1000);
     }
 
     @Test
@@ -131,22 +125,22 @@ public class DropdownTests {
         setupItems();
         String item = items.get(0).toString();
         onView(withId(R.id.dropdownId)).perform(click());
-        onData(allOf(is(instanceOf(String.class)), is(item))).perform(click());
+        onData(allOf(is(instanceOf(String.class)))).atPosition(0).perform(click());
         onView(withId(R.id.dropdownId)).check(matches(withSpinnerText(containsString(item))));
 
         String item1 = items.get(1).toString();
         onView(withId(R.id.dropdownId)).perform(click());
-        onData(allOf(is(instanceOf(String.class)), is(item1))).perform(click());
+        onData(allOf(is(instanceOf(String.class)))).atPosition(1).perform(click());
         onView(withId(R.id.dropdownId)).check(matches(withSpinnerText(containsString(item1))));
 
         String item2 = items.get(2).toString();
         onView(withId(R.id.dropdownId)).perform(click());
-        onData(allOf(is(instanceOf(String.class)), is(item2))).perform(click());
+        onData(allOf(is(instanceOf(String.class)))).atPosition(2).perform(click());
         onView(withId(R.id.dropdownId)).check(matches(withSpinnerText(containsString(item2))));
 
         String item3 = items.get(3).toString();
         onView(withId(R.id.dropdownId)).perform(click());
-        onData(allOf(is(instanceOf(String.class)), is(item3))).perform(click());
+        onData(allOf(is(instanceOf(String.class)))).atPosition(3).perform(click());
         onView(withId(R.id.dropdownId)).check(matches(withSpinnerText(containsString(item3))));
     }
 

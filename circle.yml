@@ -1,0 +1,31 @@
+general:
+    artifacts:
+        - /home/ubuntu/Project1/app/build/outputs/apk/
+
+machine:
+    environment:
+        ANDROID_HOME: /usr/local/android-sdk-linux
+
+dependencies:
+    override:
+        - echo y | android update sdk --no-ui --all --filter tools,platform-tools,build-tools-24.0.2,android-24,sys-img-armeabi-v7a-android-24,extra-google-m2repository,extra-google-google_play_services,extra-android-support
+        - ANDROID_HOME=/usr/local/android-sdk-linux ./gradlew dependencies
+
+test:
+    override:
+        - (./gradlew assemble):
+            timeout: 360
+
+test:
+     override:
+        - emulator -avd circleci-android22 -no-audio -no-window:
+            background: true
+            parallel: true
+        - circle-android wait-for-boot
+        - sleep 30
+        - adb shell input keyevent 82
+        - ./gradlew connectedAndroidTest -PdisablePreDex
+        - test ! -d app/build/outputs || cp -r app/build/outputs $CIRCLE_ARTIFACTS
+        - test ! -d app/build/reports || cp -r app/build/reports $CIRCLE_TEST_REPORTS
+#        - cp -r /home/ubuntu/Project1/app/build/outputs $CIRCLE_ARTIFACTS
+#        - cp -r /home/ubuntu/Project1/app/build/outputs/androidTest-results
