@@ -9,7 +9,6 @@ machine:
 dependencies:
     override:
         - echo y | android update sdk --no-ui --all --filter tools,platform-tools,build-tools-24.0.2,android-24,sys-img-armeabi-v7a-android-24,extra-google-m2repository,extra-google-google_play_services,extra-android-support
-        - echo n | android create avd -n testing -f -t android-24
         - ANDROID_HOME=/usr/local/android-sdk-linux ./gradlew dependencies
 
 test:
@@ -19,7 +18,7 @@ test:
 
 test:
      override:
-        - emulator -avd testing -no-audio -no-window:
+        - emulator -avd circleci-android22 -no-audio -no-window:
             background: true
             parallel: true
         - circle-android wait-for-boot
